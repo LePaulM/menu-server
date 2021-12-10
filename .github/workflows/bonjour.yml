@@ -1,18 +1,48 @@
-name: Bonjour
-on:
-  - push
+name: CI
+on :
+ - push
 jobs:
-  dire_bonjour:
+  build:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
-      - run: ls -l
-      - run: sudo apt-get install cowsay  
-      - run: cat README.md | cowsay
- 
-    container:
-      image: ghcr.io/cicd-lectures/gitpod:latest
-      options: --user root
-      
-     
-    
+      - uses: actions/setup-java@v2
+        with:
+          distribution: 'zulu'
+          java-version: '11'
+      - run: mkdir -p artifact
+      - run: echo hello > artifact/world.txt
+      - uses: actions/upload-artifact@v2
+        with:
+          name: my-artifact
+          path: artifact/world.txt
+      - run: mvn clean verify
+
+  release:
+    needs: [build]
+    if: contains (github.ref,'refs/tags/v')
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        body: |
+          Changes in this Release
+          - First Change
+          - Second Change
+        draft: false
+        prerelease: false
+
+    - uses: actions/checkout@v2
+
+    - uses: actions/download-artifact@v2
+      with:
+        name: my-artifact
+        path: path/to/artifact
