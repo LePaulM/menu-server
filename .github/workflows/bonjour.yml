@@ -10,13 +10,14 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: '11'
-      - run: mkdir -p artifact
-      - run: echo hello > artifact/world.txt
+
+      - name: Run the Maven Verify phase
+        run: mvn verify
+
       - uses: actions/upload-artifact@v2
         with:
           name: my-artifact
-          path: artifact/world.txt
-      - run: mvn clean verify
+          path: artifact/menu-server.jar
 
   release:
     needs: [build]
@@ -27,9 +28,9 @@ jobs:
       uses: actions/checkout@v2
 
     - uses: actions/download-artifact@v2
-      with:
-        name: my-artifact
-        path: path/to/artifact
+        with:
+          name: my-artifact
+          path: artifact/menu-server.jar
 
     - name: Create Release
       id: create_release
@@ -46,3 +47,7 @@ jobs:
         draft: false
         prerelease: false
 
+      - uses: actions/upload-artifact@v2
+        with:
+          name: my-artifact
+          path: artifact/menu-server.jar
