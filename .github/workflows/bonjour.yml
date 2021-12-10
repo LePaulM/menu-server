@@ -25,6 +25,12 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
+
+    - uses: actions/download-artifact@v2
+      with:
+        name: my-artifact
+        path: path/to/artifact
+
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
@@ -40,9 +46,3 @@ jobs:
         draft: false
         prerelease: false
 
-    - uses: actions/checkout@v2
-
-    - uses: actions/download-artifact@v2
-      with:
-        name: my-artifact
-        path: path/to/artifact
