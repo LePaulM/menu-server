@@ -46,8 +46,3 @@ jobs:
           - Second Change
         draft: false
         prerelease: false
-
-      - uses: actions/upload-artifact@v2
-        with:
-          name: my-artifact
-          path: artifact/menu-server.jar
